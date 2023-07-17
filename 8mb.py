@@ -2,6 +2,9 @@
 import sys
 import subprocess
 import os
+import argparse
+
+parser = argparse.ArgumentParser()
 
 def get_duration(fileInput):
 
@@ -38,13 +41,18 @@ def transcode(fileInput, fileOutput, bitrate):
     )
     #print(proc.stdout)
 
-# Tolerance below 8mb
+# Get the file size requested
+parser.add_argument("file")
+parser.add_argument("-s", "--size", help="The size of the video in MB", type=int, default=8)
+args = parser.parse_args()
+print("Target size:", args.size, "MB")
+
+# Tolerance below specified size
 tolerance = 10
-fileInput = sys.argv[1]
+fileInput = args.file
 fileOutput = fileInput + ".crushed.mp4"
-targetSizeKilobytes = 8192
-targetSizeBytes = targetSizeKilobytes * 1024
-durationSeconds = get_duration(sys.argv[1])
+targetSizeBytes = args.size * 1024 * 1024
+durationSeconds = get_duration(fileInput)
 bitrate = round( targetSizeBytes / durationSeconds)
 beforeSizeBytes = os.stat(fileInput).st_size
 
